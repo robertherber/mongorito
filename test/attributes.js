@@ -93,18 +93,24 @@ test('increment property', async t => {
 	t.is(post.get('views'), 2);
 });
 
-test('fail if incrementing property on unsaved document', async t => {
-	let post = new Post({ views: 1 });
+test('should increment property on unsaved document', async t => {
+	let post = new Post();
 
-	let isFailed = false;
+	await post.inc({ views: 1 });
 
-	try {
-		await post.inc({ views: 1 });
-	} catch (_) {
-		isFailed = true;
-	}
+	t.is(post.get('views'), 1);
+});
 
-	t.true(isFailed);
+test('should get unique incremented values', async t => {
+	let	posts = await Promise.all([
+		new Post().inc({ views: 1 }),
+		new Post().inc({ views: 1 }),
+		new Post().inc({ views: 1 })
+	]);
+
+	t.is(posts[0].get('views'), 1);
+	t.is(posts[1].get('views'), 2);
+	t.is(posts[2].get('views'), 3);
 });
 
 test('convert to JSON', t => {
