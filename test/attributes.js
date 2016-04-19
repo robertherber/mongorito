@@ -93,6 +93,35 @@ test('increment property', async t => {
 	t.is(post.get('views'), 2);
 });
 
+test('increment property and set props', async t => {
+	let post = new Post({ views: 1 });
+	await post.save();
+
+	post.set('hello', 555);
+
+	t.is(post.get('views'), 1);
+
+	await post.inc({ views: 1 });
+
+	post = await Post.findById(post.get('_id'));
+
+	t.is(post.get('views'), 2);
+	t.is(post.get('hello'), 555);
+});
+
+test('increment property and only increment the specified field', async t => {
+	let post = new Post({ views: 1 });
+	await post.save();
+
+	post.set('views', 555);
+
+	await post.inc({ views: 1 });
+
+	post = await Post.findById(post.get('_id'));
+
+	t.is(post.get('views'), 2);
+});
+
 test('should increment property on unsaved document', async t => {
 	let post = new Post();
 
