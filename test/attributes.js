@@ -171,3 +171,31 @@ test('if nothing changed, no previous value stored', t => {
 	t.notOk(post.changed.title);
 	t.is(post.get('title'), 'Sad title');
 });
+
+test('should reject modification with false criteria', async t => {
+	let post = new Post({ views: 1, name: 'Jimi' });
+	await post.save();
+
+	t.is(post.get('views'), 1);
+	t.is(post.get('name'), 'Jimi');
+
+	let modifiedPost = post.modify({ name: 'Slash' }, { $inc: { views: 1 } });
+
+	t.throws(modifiedPost);
+	t.is(post.get('views'), 1);
+	t.is(post.get('name'), 'Jimi');
+});
+
+test('should modify model with true criteria', async t => {
+	let post = new Post({ views: 1, name: 'Jimi' });
+	await post.save();
+
+	t.is(post.get('views'), 1);
+	t.is(post.get('name'), 'Jimi');
+
+	let modifiedPost = await post.modify({ name: 'Jimi' }, { $inc: { views: 1 }, $set: { name: 'Prince' } });
+
+	t.is(modifiedPost, post);
+	t.is(post.get('views'), 2);
+	t.is(post.get('name'), 'Prince');
+});
