@@ -199,3 +199,10 @@ test('should modify model with true criteria', async t => {
 	t.is(post.get('views'), 2);
 	t.is(post.get('name'), 'Prince');
 });
+
+test('should remove null and undefined properties (even nested ones) with toJSON()', t => {
+	let post = new Post({ a: null, b: undefined, c: 'c', d: { e: 'e', f: null } });
+	let json = post.toJSON();
+
+	t.same(json, { c: 'c', d: { e: 'e' } });
+});
